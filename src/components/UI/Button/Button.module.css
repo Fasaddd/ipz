@@ -1,0 +1,45 @@
+.Button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    outline: none;
+    cursor: pointer;
+    font: inherit;
+    padding: 10px;
+    margin: 10px;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    background: #e2e6fc;
+}
+
+.Button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+.Edit{
+    color: white;
+    background: #8c9aeb;
+}
+.Edit:hover{
+    background: rgb(0, 123, 145);
+    transition-duration: 0.3s;
+}
+
+.Success {
+    color: #5C9210;
+}
+.Success:hover{
+    background: rgb(158, 184, 123);
+    transition-duration: 0.3s;
+    color: #e2e6fc;
+}
+.Danger:hover{
+    background: rgb(255, 70, 70);
+    transition-duration: 0.3s;
+    color: #e2e6fc;
+}
+
+
+.Danger {
+    color: #944317;
+}
