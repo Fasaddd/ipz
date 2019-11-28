@@ -62,6 +62,7 @@ class Auth extends Component {
         // };
     };
 
+    
     onHandleInputChange = (event) => {
         let name = event.target.name;
         let value = event.target.value;
