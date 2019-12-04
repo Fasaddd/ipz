@@ -41,6 +41,9 @@ class MainPage extends Component {
     };
 
     onChangeHandler = (date) => {
+        let formattingData = date + '';
+        formattingData = formattingData.slice(0,15);
+        console.log(formattingData);
         this.setState({
             startDate: date
         });
@@ -59,7 +62,9 @@ class MainPage extends Component {
     }
 
     render() {
-        console.log(this.state.orderDescription);
+        console.log(this.state.startDate);
+        console.log(this.state.startTime);
+        // console.log(this.state.orderDescription);
         let masters = null;
         let orders = null;
         if (this.state.showMasters === true) {
@@ -94,11 +99,11 @@ class MainPage extends Component {
                             <DatePicker
                                 value={this.state.startDate}
                                 onChange={this.onChangeHandler}
-                                maxDate={new Date()}
+                                // minDate={new Date()}
                             />
                             <TimePicker
-                                maxTime="17:00:00"
-                                minTime="10:00:00"
+                                maxTime="17:00"
+                                minTime="10:00"
                                 onChange={this.onChangeTime}
                                 value={this.state.startTime}
                             />

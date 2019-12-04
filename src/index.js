@@ -20,7 +20,7 @@ const app = (
             <App />
         </BrowserRouter>
     </Provider>
-    
+
 );
 
 

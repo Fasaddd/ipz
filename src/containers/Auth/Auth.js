@@ -21,6 +21,9 @@ class Auth extends Component {
     passValid: false,
     errorUserInfo: null
   };
+  componentDidMount(){
+    this.props.history.push('/main');
+  }
 
   onClickSubmitForm = e => {
     e.preventDefault();
