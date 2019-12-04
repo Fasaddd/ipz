@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 
 import Button from "../../components/UI/Button/Button.js";
 import classes from "./Auth.module.css";
+import Spinner from '../../components/UI/Spinner/Spinner';
 
 import * as actionTypes from "../../store/actions";
 import Aux from "../../hoc/Auxillilary";
@@ -11,30 +12,29 @@ import Aux from "../../hoc/Auxillilary";
 class Auth extends Component {
   state = {
     info: {
-      email: null,
-      password: null
+      email: '',
+      password: ''
     },
     LogIn: true,
     errorPass: null,
     errorEmail: null,
     emailValid: false,
     passValid: false,
-    errorUserInfo: null
+    errorUserInfo: null,
+    loading: false
   };
-  componentDidMount(){
-    this.props.history.push('/main');
-  }
 
   onClickSubmitForm = e => {
     e.preventDefault();
+    this.setState({
+      loading: true
+    });
     let LoginMode = this.state.LogIn;
     let loginUser = { ...this.state.info };
     let activeUser = loginUser.email;
     if (LoginMode === true) {
-      console.log("Loginization");
       let userInfo = { ...this.state.info };
       let data = JSON.stringify(userInfo);
-      console.log(data);
       fetch("/login", {
         method: "POST",
         headers: {
@@ -44,19 +44,17 @@ class Auth extends Component {
       }).then(response => {
         response.json().then(body => {
           console.log(body);
-          if (body.res == "Logged") {
+          if (body.res === "Logged") {
             this.props.onSubmitForm(activeUser);
             this.props.history.push("/main");
-          }else{
-            this.setState({errorUserInfo: body.res});
+          } else {
+            this.setState({ errorUserInfo: body.res, loading: false });
           }
         });
       });
     } else {
-      console.log("SignUp");
       let userInfo = { ...this.state.info };
       let data = JSON.stringify(userInfo);
-      console.log(data);
       fetch("/register", {
         method: "POST",
         headers: {
@@ -65,15 +63,21 @@ class Auth extends Component {
         body: data
       }).then(response => {
         response.json().then(body => {
-          if (body.result == "INSERT") {
+          if (body.result === "INSERT") {
             this.props.onSubmitForm(activeUser);
             this.props.history.push("/main");
           } else {
-            this.setState({ errorUserInfo: body.result });
+            this.setState({ errorUserInfo: body.result, loading: false });
           }
         });
       });
     }
+    this.setState({
+      info: {
+        email: '',
+        password: ''
+      }
+    })
   };
 
   onHandleInputChange = event => {
@@ -101,7 +105,6 @@ class Auth extends Component {
           });
         break;
       case "password":
-        console.log(value.length);
         let passValid = value.length >= 6;
         passValid
           ? this.setState({ errorPass: null, passValid: true })
@@ -137,7 +140,7 @@ class Auth extends Component {
         </Aux>
       );
     }
-    return (
+    let resulting = (
       <div className={classes.Auth}>
         <div style={{ color: "red", fontSize: "20px" }}>
           {this.state.errorUserInfo}
@@ -147,12 +150,14 @@ class Auth extends Component {
           <input
             type="email"
             name="email"
+            value={this.state.info.email}
             onChange={this.onHandleInputChange}
             placeholder="test@test.com"
           />
           <input
             type="password"
             name="password"
+            value={this.state.info.password}
             onChange={this.onHandleInputChange}
             placeholder="1234567"
           />
@@ -163,12 +168,18 @@ class Auth extends Component {
             btnType="Success"
           >
             Submit
-          </Button>
+        </Button>
         </form>
         <Button btnType="Danger" clicked={this.onClickChangeSign}>
           SWITCH TO {this.state.LogIn ? "SignIn" : "LogIn"}
         </Button>
       </div>
+    )
+    if (this.state.loading) {
+      resulting = <Spinner />
+    }
+    return (
+      <Aux>{resulting}</Aux>
     );
   }
 }

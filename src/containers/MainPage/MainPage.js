@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 
@@ -7,8 +6,8 @@ import classes from './MainPage.module.scss';
 import Button from '../../components/UI/Button/Button';
 import Aux from '../../hoc/Auxillilary';
 
+import 'rc-time-picker/assets/index.css';
 import DatePicker from 'react-date-picker';
-import TimePicker from 'react-time-picker';
 
 
 
@@ -40,19 +39,79 @@ class MainPage extends Component {
         startDate: new Date(),
         startTime: '10:00',
         masterChecked: '',
-        submitButtonOn: false
+        submitButtonOn: false,
+        informForm: null
     };
 
+    componentDidMount() {
+        this.setState({
+            orderInfo: {
+                ...this.state.orderInfo,
+                login: this.props.activeUser
+            }
+        })
+    }
+
+
     clickNextStepMasters = () => {
-        if (this.state.showMasters === true && this.state.showOrder === true) {
-            console.log('Fetching');
-        }
+        console.log('fetching');
         if (this.state.showMasters === false) {
             this.setState({ showMasters: true })
         } else {
             this.setState({ showOrder: true })
         };
-    };
+        if (this.state.showOrder === true) {
+            if (this.state.orderInfo.masterid.length === 0 && this.state.orderInfo.service.length === 0) {
+                this.setState({
+                    informForm: "You have not choosed any master and service! Please make a choice!"
+                })
+            } else if (this.state.orderInfo.masterid.length === 0) {
+                this.setState({
+                    informForm: "You have not choosed any master! Please choose master"
+                });
+            } else if (this.state.orderInfo.service.length === 0) {
+                this.setState({
+                    informForm: "You have not choosed any service! Please choose service!"
+                });
+
+            } else {
+                console.log(this.props.activeUser);
+                let loginOrder = this.props.activeUser;
+                this.setState({
+                    orderInfo: {
+                        ...this.state.orderInfo,
+                        login: loginOrder
+                    }
+                });
+                console.log(this.state.orderInfo);
+                let data = { ...this.state.orderInfo };
+                data = JSON.stringify(data);
+                if (this.state.showMasters === true && this.state.showOrder === true) {
+                    fetch("/order", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: data
+                    }).then(response => {
+                        response.json().then(body => {
+                            if (body.res === "Success! Your seans was added! Check your orders") {
+                                this.setState({
+                                    informForm: body.res
+                                })
+                            } else {
+                                this.setState({
+                                    informForm: body.res
+                                })
+                            }
+                            console.log(body);
+                        });
+                    });
+                }
+            }
+        }
+
+    }
 
     onChangeRadioServiceHandler = (event) => {
         this.setState({
@@ -72,7 +131,7 @@ class MainPage extends Component {
                 masterid: event.target.name
             }
         });
-    }
+    };
 
     onChangeDateHandler = (date) => {
         let formattingData = date + '';
@@ -87,15 +146,14 @@ class MainPage extends Component {
     };
 
     onChangeTimeHandler = (event) => {
-        console.log(event);
         // let formattingTime = time + '';
-        // this.setState({
-        //     orderInfo: {
-        //         ...this.state.orderInfo,
-        //         hour: formattingTime
-        //     },
-        //     startTime: time
-        // });
+        this.setState({
+            orderInfo: {
+                ...this.state.orderInfo,
+                hour: event.target.value
+            },
+            startTime: event.target.value
+        });
     };
 
     onChangeHandlerDescription = (event) => {
@@ -112,7 +170,14 @@ class MainPage extends Component {
         if (this.state.showMasters === true && this.state.showOrder === true) {
             buttonNext = "Submit order";
         }
-        console.log("OrderInfo", this.state.orderInfo);
+
+        let informationAboutRequestOrder = null;
+        if (this.state.informForm === 'Success! Your seans was added! Check your orders') {
+            informationAboutRequestOrder = <p style={{ fontSize: '18px', color: 'green' }}>{this.state.informForm}</p>
+        } else {
+            informationAboutRequestOrder = <p style={{ fontSize: '18px', color: 'red' }}>{this.state.informForm}</p>
+        }
+
         let masters = null;
         let orders = null;
         if (this.state.showMasters === true) {
@@ -153,11 +218,17 @@ class MainPage extends Component {
                                 onChange={this.onChangeDateHandler}
                                 minDate={new Date()}
                             />
-                            <TimePicker
-                                maxDetail="minute"
-                                onChange={this.onChangeTimeHandler}
-                                value={this.state.startTime}
-                            />
+                            <div>
+                                <input
+                                    style={{ width: '151px', height: '25px', fontSize: '15px' }}
+                                    max="18:00"
+                                    min="10:00"
+                                    type="time"
+                                    step="3600"
+                                    value={this.state.startTime}
+                                    onChange={this.onChangeTimeHandler} />
+                            </div>
+
                         </div>
                         <div>
                             <h3>Descript your wish and we will call you:</h3>
@@ -210,6 +281,7 @@ class MainPage extends Component {
                 {masters}
                 {orders}
                 <Button btnType='Success' clicked={this.clickNextStepMasters}>{buttonNext}</Button>
+                <div>{informationAboutRequestOrder}</div>
             </div>
         );
     };

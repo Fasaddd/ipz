@@ -1,19 +1,59 @@
 .Toolbar {
-    height: 56px;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: #f76cb5;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    box-sizing: border-box;
-    z-index: 90;
+  height: 56px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #f76cb5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  z-index: 90;
 }
-.LogOut{
+.LogOut {
+  display: flex;
+  padding: 3px;
+  box-sizing: border-box;
+}
+.Navigation {   
     display: flex;
-    padding: 3px;
-    box-sizing: border-box;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    height: 100%;
+}
+.Navigate {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  height: 100%;
+}
+
+.NavigationItem {
+  margin: 0;
+  display: flex;
+  height: 100%;
+  width: auto;
+}
+
+.NavigationItem a {
+  text-decoration: none;
+  font-size: 18px;
+  color: white;
+  padding: 16px 10px;
+  border-bottom: 4px solid transparent;
+}
+
+.NavigationItem a:hover,
+.NavigationItem a:active,
+.NavigationItem a.active {
+  cursor: pointer;
+  background-color: #1d05f0;
+  border-bottom: 4px solid black;
+  color: white;
+  transition-duration: 0.5s;
 }

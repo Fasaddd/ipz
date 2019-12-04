@@ -51,7 +51,6 @@ app.post("/register", jsonParser, function (request, response) {
 });
 
 
-
 // LOGIN
 app.post("/login", jsonParser, function (request, response) {
     const data = { email: request.body.email, password: request.body.password };
@@ -74,8 +73,8 @@ app.post("/login", jsonParser, function (request, response) {
     })
 });
 
+// ORDER THE SEANS
 app.post("/order", jsonParser, async function (request, response) {
-    console.log(request.body);
     let data = {
         service: request.body.service,
         login: request.body.login,
@@ -87,13 +86,14 @@ app.post("/order", jsonParser, async function (request, response) {
     let checkExisting = false;
     try {
         let res = await client.query("SELECT * from orders");
+        console.log(request.body);
+        console.log(res.rows);
         res.rows.forEach(el => {
             if (el.service == data.service && el.masterid == data.masterid) {
-                console.log("ID SERVICE");
                 console.log(el.date, data.date, el.hour, data.hour);
                 if (el.date == data.date && el.hour == data.hour) {
                     if (el.hour == data.hour) {
-                        result = { res: "Choose another time for this date" };
+                        result = { res: "Sorry but this time is busy:( Choose another time for this date!" };
                         checkExisting = true;
                     }
                 }
@@ -101,7 +101,7 @@ app.post("/order", jsonParser, async function (request, response) {
         });
         if (!checkExisting) {
             client.query('INSERT INTO orders (service, login, masterId, hour, date) VALUES ($1, $2, $3, $4, $5)', [data.service, data.login, data.masterid, data.hour, data.date]);
-            result = { res: "Your seans was added!" };
+            result = { res: "Success! Your seans was added! Check your orders" };
         }
     } catch (err) {
         result = { res: err.stack };
@@ -109,5 +109,19 @@ app.post("/order", jsonParser, async function (request, response) {
     console.log(result);
     response.send(result);
 });
+
+// USERS ORDERS
+app.post("/userorder", jsonParser, async function (request, response) {
+    let data = { login: request.body.login };
+    let result = [];
+    try {
+        let res = await client.query("SELECT * from orders WHERE login=$1", [data.login]);
+        result = [...res.rows];
+    } catch (err) {
+        result = { res: err.stack };
+    }
+    response.send(result);
+});
+
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
