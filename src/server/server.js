@@ -17,12 +17,12 @@ client.connect();
 const jsonParser = express.json();
 
 // REGISTER
-app.post("/register", jsonParser, function(request, response) {
+app.post("/register", jsonParser, function (request, response) {
     const data = { email: request.body.email, password: request.body.password };
     console.log(data);
     let result = false;
-    client.query("SELECT * from users", async(err, res) => {
-       
+    client.query("SELECT * from users", async (err, res) => {
+
         console.log(res.rows);
         if (err) {
             console.log(err);
@@ -53,7 +53,7 @@ app.post("/register", jsonParser, function(request, response) {
 
 
 // LOGIN
-app.post("/login", jsonParser, function(request, response) {
+app.post("/login", jsonParser, function (request, response) {
     const data = { email: request.body.email, password: request.body.password };
     let exist = false;
     client.query("SELECT * from users", (err, res) => {
@@ -72,6 +72,42 @@ app.post("/login", jsonParser, function(request, response) {
             }
         }
     })
+});
+
+app.post("/order", jsonParser, async function (request, response) {
+    console.log(request.body);
+    let data = {
+        service: request.body.service,
+        login: request.body.login,
+        masterid: request.body.masterid,
+        hour: request.body.hour,
+        date: request.body.date
+    };
+    let result = {};
+    let checkExisting = false;
+    try {
+        let res = await client.query("SELECT * from orders");
+        res.rows.forEach(el => {
+            if (el.service == data.service && el.masterid == data.masterid) {
+                console.log("ID SERVICE");
+                console.log(el.date, data.date, el.hour, data.hour);
+                if (el.date == data.date && el.hour == data.hour) {
+                    if (el.hour == data.hour) {
+                        result = { res: "Choose another time for this date" };
+                        checkExisting = true;
+                    }
+                }
+            }
+        });
+        if (!checkExisting) {
+            client.query('INSERT INTO orders (service, login, masterId, hour, date) VALUES ($1, $2, $3, $4, $5)', [data.service, data.login, data.masterid, data.hour, data.date]);
+            result = { res: "Your seans was added!" };
+        }
+    } catch (err) {
+        result = { res: err.stack };
+    }
+    console.log(result);
+    response.send(result);
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
