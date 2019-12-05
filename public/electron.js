@@ -2,6 +2,8 @@ const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
+const {Menu} = require('electron');
+
 const path = require('path');
 const isDev = require('electron-is-dev');
 
@@ -19,7 +21,7 @@ function createWindow() {
 }
 
 app.on('ready', createWindow);
-
+Menu.setApplicationMenu(false);
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();

@@ -6,7 +6,6 @@ import classes from './MainPage.module.scss';
 import Button from '../../components/UI/Button/Button';
 import Aux from '../../hoc/Auxillilary';
 
-import 'rc-time-picker/assets/index.css';
 import DatePicker from 'react-date-picker';
 
 
